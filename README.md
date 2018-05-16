@@ -6,6 +6,7 @@ Node.js Express Server which does show the incoming request on the console.
     $ npm install showServer --save
 
 ##How to use?
+
 ```js
 #!/usr/bin/env node
 
@@ -19,8 +20,7 @@ showServer.start(8080,8443);
 ```
 
 ## How to run the server?
-```
-node shoswerver.js
+If we assume that you did implement showServer inside the app.js file you can start it as follow:
 
     $ node app.js
 

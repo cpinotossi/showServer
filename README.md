@@ -1,12 +1,34 @@
 # showserver
 Node.js Express Server which does show the incoming request on the console.
 
+## Installation
+
+    $ npm install showServer --save
+
+##How to use?
+```js
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+var showServer = require('showServer');
+
+//Start server by either passing two arguments port for http and port for https or keep default ports 80,443
+showServer.start(8080,8443);
+```
+
 ## How to run the server?
 ```
 node shoswerver.js
-```
 
-## How to use the server?
+    $ node app.js
+
+Note: In case you are using port 80 or 443 you maybe will need to use sudo to allow showServer to listen on this ports.
+
+    $ sudo node app.js
+    
+## How to send request to the showServer?
 you can test it via cURL on port 80.
 You can use whatever path you like to use, the outcome will always be the same:
 the showserver will just replay to you all the details about the HTTP request you did send:

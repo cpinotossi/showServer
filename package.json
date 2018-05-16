@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cpinotossi/showServer"
+    "url": "https://github.com/cpinotossi/showserver"
   },
   "dependencies": {
     "express": "^4.16.3",

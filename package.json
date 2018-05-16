@@ -1,5 +1,5 @@
 {
-  "name": "showServer",
+  "name": "showserver",
   "version": "1.0.0",
   "description": "Mirror the incoming request in the response.",
   "main": "index.js",

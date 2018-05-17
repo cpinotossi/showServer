@@ -172,3 +172,7 @@ openssl req -x509 -passin pass:"test123" -passout pass:"test123" -newkey rsa:204
 ```
 openssl rsa -passin pass:"test123" -in tmp.key.pem -out key.pem && rm -f tmp.key.pem
 ```
+## FAQ
+### How did I know how to implement the CLI?
+I used the followin tutorial from blog.npmjs.org to learn how to setup an CLI at Node.js:
+https://blog.npmjs.org/post/118810260230/building-a-simple-command-line-tool-with-npm

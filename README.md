@@ -3,7 +3,7 @@ Node.js Express Server which does show the incoming request on the console.
 
 ## Installation
 
-    $ npm install showServer --save
+    $ npm install showserver --save
 
 ##How to use?
 
@@ -13,32 +13,57 @@ Node.js Express Server which does show the incoming request on the console.
 /**
  * Module dependencies.
  */
-var showServer = require('showServer');
+var showServer = require('showserver');
 
 //Start server by either passing two arguments port for http and port for https or keep default ports 80,443
 showServer.start(8080,8443);
 ```
 
 ## How to run the server?
-If we assume that you did implement showServer inside the app.js file you can start it as follow:
+
+Before running the server you should ensure that the ports are open. In case you run on Ubuntu you would open the ports as follow:
+
+   $ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+   $ sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+You can also check if the ports are already in use on Ubuntu as follow:
+
+   $ sudo lsof -i -P -n | grep LISTEN
+   node       3331     root   11u  IPv6 4289110      0t0  TCP *:80 (LISTEN)
+   node       3331     root   12u  IPv6 4289111      0t0  TCP *:443 (LISTEN)
+
+If we assume that you did implement showserver inside the app.js file you can start it as follow:
 
     $ node app.js
 
 Note: In case you are using port 80 or 443 you maybe will need to use sudo to allow showServer to listen on this ports.
 
     $ sudo node app.js
-    
+
+
+## How to run from CLI?
+In case you like to use showserver from the command line you will need to install it globally as follow:
+
+    $ sudo npm install showserver --g
+
+NOTE: If you install showserver globally you will either need to use sudo or nvm, see here for further details:
+https://docs.npmjs.com/getting-started/fixing-npm-permissions
+
+Afterwards you can just start it as follow:
+
+   $ sudo showserver
+
 ## How to send request to the showServer?
 you can test it via cURL on port 80.
 You can use whatever path you like to use, the outcome will always be the same:
 the showserver will just replay to you all the details about the HTTP request you did send:
 ```
-curl http://localhost/blablabla -v
+curl http://sample.host.com/blablabla -v
 *   Trying ::1...
 * TCP_NODELAY set
-* Connected to localhost (::1) port 80 (#0)
+* Connected to sample.host.com (::1) port 80 (#0)
 > GET /blablabla HTTP/1.1
-> Host: localhost
+> Host: sample.host.com
 > User-Agent: curl/7.58.0
 > Accept: */*
 > Pragma: akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values
@@ -57,7 +82,7 @@ curl http://localhost/blablabla -v
     "user-agent": "curl/7.58.0",
     "accept": "*/*",
     "pragma": "akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values"
-* Connection #0 to host localhost left intact
+* Connection #0 to host sample.host.com left intact
 }
 ```
 Same counts also for POST request:
@@ -65,9 +90,9 @@ Same counts also for POST request:
 curl -d test:test http://localhost/blablabla -v
 *   Trying ::1...
 * TCP_NODELAY set
-* Connected to localhost (::1) port 80 (#0)
+* Connected to sample.host.com (::1) port 80 (#0)
 > POST /blablabla HTTP/1.1
-> Host: localhost
+> Host: sample.host.com
 > User-Agent: curl/7.58.0
 > Accept: */*
 > Pragma: akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values
@@ -85,7 +110,7 @@ curl -d test:test http://localhost/blablabla -v
 <
 "/blablabla"
 {
-    "host": "localhost",
+    "host": "sample.host.com",
     "user-agent": "curl/7.58.0",
     "accept": "*/*",
     "pragma": "akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values",
@@ -94,17 +119,17 @@ curl -d test:test http://localhost/blablabla -v
 }
 {
     "test:test": ""
-* Connection #0 to host localhost left intact
+* Connection #0 to host sample.host.com left intact
 }
 ```
 Hand you can do it even via HTTPS.
 IMPORTANT: Please not that showserver does use a self signed certificate which you will need to accept.
 In case of cURL we use the flag -k to ignor certification warnings:
 ```
-curl -d test:test https://localhost/blablabla -v -k
+curl -d test:test https://sample.host.com/blablabla -v -k
 *   Trying ::1...
 * TCP_NODELAY set
-* Connected to localhost (::1) port 443 (#0)
+* Connected to sample.host.com (::1) port 443 (#0)
 * ALPN, offering h2
 * ALPN, offering http/1.1
 * Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
@@ -131,7 +156,7 @@ curl -d test:test https://localhost/blablabla -v -k
 *  issuer: CN=sample.host.com
 *  SSL certificate verify result: self signed certificate (18), continuing anyway.
 > POST /blablabla HTTP/1.1
-> Host: localhost
+> Host: sample.host.com
 > User-Agent: curl/7.58.0
 > Accept: */*
 > Pragma: akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values
@@ -149,7 +174,7 @@ curl -d test:test https://localhost/blablabla -v -k
 <
 "/blablabla"
 {
-    "host": "localhost",
+    "host": "sample.host.com",
     "user-agent": "curl/7.58.0",
     "accept": "*/*",
     "pragma": "akamai-x-get-cache-key, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-get-true-cache-key, akamai-x-get-extracted-values",
@@ -158,7 +183,7 @@ curl -d test:test https://localhost/blablabla -v -k
 }
 {
     "test:test": ""
-* Connection #0 to host localhost left intact
+* Connection #0 to host sample.host.com left intact
 }
 ```
 

@@ -6,14 +6,11 @@
 var showServer = require('../index.js');
 var cmd = require('commander');
 
-
 cmd
-  .version('1.0.0')
-  .option('-h, --http [type]', 'port to be used for http traffic')
-  .option('-s, --https [type]', 'port to be used for https traffic')
+  .version('1.0.3')
+  .option('-p, --port [type]', 'port to be used, default=80')
+  .option('-s, --https', 'Use https instead of http')
   .parse(process.argv);
 
-var httpPort = cmd.http || 80;
-var httpsPort = cmd.https || 443;
-showServer.start(httpPort,httpsPort);
-
+//Validation of port and https is handled by showServer implementation
+showServer.start(cmd.port,cmd.https);

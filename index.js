@@ -1,4 +1,4 @@
-exports.start = function(httpPort, httpsPort){
+exports.start = function(port, isHttps){
   /**
    * Module dependencies.
    */
@@ -6,18 +6,21 @@ exports.start = function(httpPort, httpsPort){
   var bodyParser = require('body-parser');
   var multer = require('multer'); // v1.0.5
 
+  //Verify if we need to support Https
+  if (isHttps === undefined) {
+    isHttps = false;
+  } else if(typeof(isHttps) !== "boolean"){
+    isHttps = false;
+  }
+  //Define port
+  if (port === undefined) {
+    port = 80;
+  }
+
   //instantiate multer object
   var upload = multer(); // for parsing multipart/form-data
   //instantiate an express object
   const app = express()
-
-  //read keys from filesystem for https
-  var fs = require('fs'),
-      https = require('https'),
-      http = require("http");
-  var privateKey  = fs.readFileSync(__dirname + '/key.pem', 'utf8');
-  var certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
-  var credentials = {key: privateKey, cert: certificate};
 
   //GET Request Handler
   app.get('/*', (req, res) => {
@@ -41,11 +44,20 @@ exports.start = function(httpPort, httpsPort){
       res.send(response);
   });
 
-  var httpServer = http.createServer(app);
-  var httpsServer = https.createServer(credentials, app);
+  if(isHttps){
+    //Https support
+    //read keys from filesystem for https
+    var fs = require('fs');
+    var privateKey  = fs.readFileSync(__dirname + '/key.pem', 'utf8');
+    var certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
+    var credentials = {key: privateKey, cert: certificate};
+    var https = require('https');
+    var server = https.createServer(credentials, app);
+  }else{
+    //Http support
+    var http = require("http");
+    var server = http.createServer(app);
+  }
   //Start Server
-  var httpPort = httpPort || 80;
-  var httpsPort = httpsPort || 443;
-  httpServer.listen(httpPort);
-  httpsServer.listen(httpsPort);
+  server.listen(port);
 };

@@ -2,6 +2,7 @@ exports.start = function(port, isHttps){
   /**
    * Module dependencies.
    */
+  const resize = require('./resize');
   const express = require('express')
   var bodyParser = require('body-parser');
   var multer = require('multer'); // v1.0.5
@@ -22,6 +23,26 @@ exports.start = function(port, isHttps){
   //instantiate an express object
   const app = express()
 
+  //GET Image Request Handler
+  app.get('/images/jpeg/*', (req, res) => {
+    // if(req.is("image/*")){
+      //
+      // Sample request path /images/3000/3000/P00277259.jpg
+      var imagePathArray = req.path.split("/").filter(function (part) { return !!part; });//filter first empty entry.
+      var imageFormat = imagePathArray[1];
+      var imageFileName = imagePathArray[(imagePathArray.length-1)]; //extract last url path component
+      var imageWidth = parseInt(imagePathArray[2]);//extract first path component
+      var imageHight = parseInt(imagePathArray[3]);//extract second path component
+      var imageFolderPath = ".images/"
+      var imageLocal = `./images/${imageFileName}`;
+      res.type(`image/${imageFormat}`);
+      // Get the resized image
+      resize(imageLocal, imageWidth, imageHight).pipe(res);
+    // }else{
+    //   res.sendfile('public/sorry.jpg');
+    // }
+  })
+
   //GET Request Handler
   app.get('/*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
@@ -31,6 +52,7 @@ exports.start = function(port, isHttps){
     res.send(response);
   })
 
+  app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.json()); // for parsing application/json
   app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 

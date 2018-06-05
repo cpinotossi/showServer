@@ -3,7 +3,7 @@ exports.start = function(port, isHttps){
    * Module dependencies.
    */
   const resize = require('./resize');
-  const express = require('express')
+  const express = require('express');
   var bodyParser = require('body-parser');
   var multer = require('multer'); // v1.0.5
 
@@ -25,9 +25,10 @@ exports.start = function(port, isHttps){
 
   //GET Image Request Handler
   app.get('/images/jpeg/*', (req, res) => {
-    // if(req.is("image/*")){
-      //
-      // Sample request path /images/3000/3000/P00277259.jpg
+    var url = JSON.stringify(req.url, null, 4);
+    var headers = JSON.stringify(req.headers, null, 4);
+    var response = url+"\n"+headers;
+    console.log(response)
       var imagePathArray = req.path.split("/").filter(function (part) { return !!part; });//filter first empty entry.
       var imageFormat = imagePathArray[1];
       var imageFileName = imagePathArray[(imagePathArray.length-1)]; //extract last url path component
@@ -37,10 +38,14 @@ exports.start = function(port, isHttps){
       var imageLocal = `./images/${imageFileName}`;
       res.type(`image/${imageFormat}`);
       // Get the resized image
-      resize(imageLocal, imageWidth, imageHight).pipe(res);
-    // }else{
-    //   res.sendfile('public/sorry.jpg');
-    // }
+      const fs = require('fs');
+      const readStream = fs.createReadStream(imageLocal);
+      resize(readStream, imageWidth, imageHight).pipe(res);
+      readStream.on('error', function(){
+        res.status(404);
+        res.type('image/jpeg');
+        res.sendfile('public/sorry.jpg');
+      });
   })
 
   //GET Request Handler

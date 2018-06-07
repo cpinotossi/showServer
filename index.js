@@ -29,6 +29,9 @@ exports.start = function(port, isHttps){
     var headers = JSON.stringify(req.headers, null, 4);
     var response = url+"\n"+headers;
     console.log(response)
+    if(req.get("if-modified-since")){
+      res.status(304).send();
+    }else{
       var imagePathArray = req.path.split("/").filter(function (part) { return !!part; });//filter first empty entry.
       var imageFormat = imagePathArray[1];
       var imageFileName = imagePathArray[(imagePathArray.length-1)]; //extract last url path component
@@ -40,12 +43,14 @@ exports.start = function(port, isHttps){
       // Get the resized image
       const fs = require('fs');
       const readStream = fs.createReadStream(imageLocal);
-      resize(readStream, imageWidth, imageHight).pipe(res);
+      resize(readStream, imageWidth, imageHight).pipe(res.set('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT'));
       readStream.on('error', function(){
         res.status(404);
         res.type('image/jpeg');
         res.sendfile('public/sorry.jpg');
       });
+
+    }
   })
 
   //GET Request Handler

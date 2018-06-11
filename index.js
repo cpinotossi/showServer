@@ -4,6 +4,7 @@ exports.start = function(port, isHttps){
    */
   const resize = require('./resize');
   const express = require('express');
+  var defaultTTL = "300";
   var bodyParser = require('body-parser');
   var multer = require('multer'); // v1.0.5
 
@@ -54,38 +55,42 @@ exports.start = function(port, isHttps){
   })
 
   //GET Request Handler
-  app.get('/cc*', (req, res) => {
+  app.get('/cc*', async function(req, res){
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
     var requestDetails = url+"\n"+headers;
     console.log("Request Header:"+requestDetails);
     res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
-    if(req.query.ccttl){
-        if(req.query.ccim){
-            res.setHeader('Cache-Control', `max-age=${req.query.ccttl}, immutable`);
-            if(req.query.ec){
-                res.setHeader(`Edge-Control`, `max-age=${req.query.ccttl}, immutable`);
-            }
-        }else{
-          res.setHeader(`Cache-Control`, `max-age=300`);
-          if(req.query.ec){
-              res.setHeader(`Edge-Control`, `max-age=300`);
-          }
-        }
-    }else{
-      if(req.query.ccim){
-          res.setHeader('Cache-Control', `max-age=300, immutable`);
-          if(req.query.ec){
-              res.setHeader(`Edge-Control`, `max-age=300, immutable`);
-          }
-      }else{
-        res.setHeader(`Cache-Control`, `max-age=300`);
-        if(req.query.ec){
-            res.setHeader(`Edge-Control`, `max-age=300`);
-        }
+
+    if(req.query.ccttl !== undefined){
+      if(req.query.ccim !== undefined){
+          res.setHeader('Cache-Control', `max-age=${req.query.ccttl}, immutable`);
+      } else {
+        res.setHeader('Cache-Control', `max-age=${req.query.ccttl}`);
+      }
+    } else {
+      if(req.query.ccim !== undefined){
+          //Use default value of 300sec
+          res.setHeader('Cache-Control', `max-age=${defaultTTL}, immutable`);
+      } else {
+        //do not send Cache-Control Header
       }
     }
 
+    if(req.query.ecttl !== undefined){
+      if(req.query.ecim !== undefined){
+          res.setHeader('Edge-Control', `max-age=${req.query.ecttl}, immutable`);
+      } else {
+        res.setHeader('Edge-Control', `max-age=${req.query.ecttl}`);
+      }
+    } else {
+      if(req.query.ecim !== undefined){
+          //Use default value of 300sec
+          res.setHeader('Edge-Control', `max-age=${defaultTTL}, immutable`);
+      } else {
+        //do not send Cache-Control Header
+      }
+    }
 
     console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
     res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));

@@ -54,26 +54,39 @@ exports.start = function(port, isHttps){
   })
 
   //GET Request Handler
-  app.get('/cci*', (req, res) => {
+  app.get('/cc*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
     var requestDetails = url+"\n"+headers;
     console.log("Request Header:"+requestDetails);
     res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
-    res.setHeader('Cache-Control', 'max-age=300, immutable');
-    console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
-    res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
-  })
+    if(req.query.ccttl){
+        if(req.query.ccim){
+            res.setHeader('Cache-Control', `max-age=${req.query.ccttl}, immutable`);
+            if(req.query.ec){
+                res.setHeader(`Edge-Control`, `max-age=${req.query.ccttl}, immutable`);
+            }
+        }else{
+          res.setHeader(`Cache-Control`, `max-age=300`);
+          if(req.query.ec){
+              res.setHeader(`Edge-Control`, `max-age=300`);
+          }
+        }
+    }else{
+      if(req.query.ccim){
+          res.setHeader('Cache-Control', `max-age=300, immutable`);
+          if(req.query.ec){
+              res.setHeader(`Edge-Control`, `max-age=300, immutable`);
+          }
+      }else{
+        res.setHeader(`Cache-Control`, `max-age=300`);
+        if(req.query.ec){
+            res.setHeader(`Edge-Control`, `max-age=300`);
+        }
+      }
+    }
 
-  //GET Request Handler
-  app.get('/eci*', (req, res) => {
-    var url = JSON.stringify(req.url, null, 4);
-    var headers = JSON.stringify(req.headers, null, 4);
-    var requestDetails = url+"\n"+headers;
-    console.log("Request Header:"+requestDetails);
-    res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
-    res.setHeader('Cache-Control', 'max-age=300, immutable');
-    res.setHeader('Edge-Control', 'max-age=300, immutable');
+
     console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
     res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
   })

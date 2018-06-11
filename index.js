@@ -53,6 +53,31 @@ exports.start = function(port, isHttps){
     }
   })
 
+
+
+  //GET Request Handler
+  app.get('/cci', (req, res) => {
+    var url = JSON.stringify(req.url, null, 4);
+    var headers = JSON.stringify(req.headers, null, 4);
+    var response = url+"\n"+headers;
+    console.log(response);
+    res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
+    res.setHeader('Cache-Control', 'max-age=300, immutable');
+    res.send(response);
+  })
+
+  //GET Request Handler
+  app.get('/eci', (req, res) => {
+    var url = JSON.stringify(req.url, null, 4);
+    var headers = JSON.stringify(req.headers, null, 4);
+    var response = url+"\n"+headers;
+    console.log(response);
+    res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
+    res.setHeader('Cache-Control', 'max-age=300, immutable');
+    res.setHeader('Edge-Control', 'max-age=300, immutable');
+    res.send(response);
+  })
+
   //GET Request Handler
   app.get('/*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
@@ -67,12 +92,12 @@ exports.start = function(port, isHttps){
   app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
   //POST Request Handler
-  app.post('/*', upload.array(), (req, res, next) => {
+  app.post('/cc', upload.array(), (req, res, next) => {
       var url = JSON.stringify(req.url, null, 4);
       var headers = JSON.stringify(req.headers, null, 4);
       var body = JSON.stringify(req.body, null, 4);
       var response = url+"\n"+headers+"\n"+body;
-      console.log(response)
+      console.log(response);
       res.send(response);
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "showserver",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Mirror the incoming request in the response.",
   "main": "index.js",
   "bin": {

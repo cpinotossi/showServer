@@ -2,7 +2,7 @@
   "name": "showserver",
   "version": "1.0.8",
   "description": "Mirror the incoming request in the response.",
-  "main": "server.js",
+  "main": "index.js",
   "bin": {
     "showserver": "./bin/showserver"
   },

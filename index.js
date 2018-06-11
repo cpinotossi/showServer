@@ -27,8 +27,8 @@ exports.start = function(port, isHttps){
   app.get('/images/jpeg/*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
-    var response = url+"\n"+headers;
-    console.log(response)
+    var requestDetails = url+"\n"+headers;
+    console.log(requestDetails)
     if(req.get("if-modified-since")){
       res.status(304).send();
     }else{
@@ -54,35 +54,38 @@ exports.start = function(port, isHttps){
   })
 
   //GET Request Handler
-  app.get('/cci', (req, res) => {
+  app.get('/cci*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
-    var response = url+"\n"+headers;
-    console.log(response);
+    var requestDetails = url+"\n"+headers;
+    console.log("Request Header:"+requestDetails);
     res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
     res.setHeader('Cache-Control', 'max-age=300, immutable');
-    res.send(response);
+    console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
+    res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
   })
 
   //GET Request Handler
-  app.get('/eci', (req, res) => {
+  app.get('/eci*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
-    var response = url+"\n"+headers;
-    console.log(response);
+    var requestDetails = url+"\n"+headers;
+    console.log("Request Header:"+requestDetails);
     res.setHeader('Last-Modified', 'Thu, 07 Jun 2018 17:16:20 GMT');
     res.setHeader('Cache-Control', 'max-age=300, immutable');
     res.setHeader('Edge-Control', 'max-age=300, immutable');
-    res.send(response);
+    console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
+    res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
   })
 
   //GET Request Handler
   app.get('/*', (req, res) => {
     var url = JSON.stringify(req.url, null, 4);
     var headers = JSON.stringify(req.headers, null, 4);
-    var response = url+"\n"+headers;
-    console.log(response)
-    res.send(response);
+    var requestDetails = url+"\n"+headers;
+    console.log("Request Header:"+requestDetails);
+    console.log("Response Header:"+JSON.stringify(res.header()._headers, null, 4))
+    res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
   })
 
   app.use(express.static(__dirname + '/public'));
@@ -94,8 +97,8 @@ exports.start = function(port, isHttps){
       var url = JSON.stringify(req.url, null, 4);
       var headers = JSON.stringify(req.headers, null, 4);
       var body = JSON.stringify(req.body, null, 4);
-      var response = url+"\n"+headers+"\n"+body;
-      console.log(response);
+      var requestDetails = url+"\n"+headers+"\n"+body;
+      console.log(requestDetails);
       res.send(response);
   });
 

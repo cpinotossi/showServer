@@ -4,9 +4,13 @@ exports.start = function(port, isHttps){
    */
   const resize = require('./resize');
   const express = require('express');
+  const serveStatic = require('serve-static')
+  const path = require('path');
+  const fs = require('fs');
   var defaultTTL = "300";
   var bodyParser = require('body-parser');
   var multer = require('multer'); // v1.0.5
+
 
   //Verify if we need to support Https
   if (isHttps === undefined) {
@@ -22,7 +26,25 @@ exports.start = function(port, isHttps){
   //instantiate multer object
   var upload = multer(); // for parsing multipart/form-data
   //instantiate an express object
-  const app = express()
+  const app = express();
+
+  var staticOptions = {
+    dotfiles: 'ignore',
+    etag: true,
+    index: false,
+    lastModified: true,
+    maxAge: '2h',
+    setHeaders: function (res, path, stat) {
+      res.set('x-timestamp', Date.now())
+    }
+  }
+
+  //app.use(express.static(__dirname + '/public', staticOptions));
+  app.use(serveStatic(path.join(__dirname, 'public'), staticOptions));
+
+  if (!fs.existsSync('./public')) {
+    fs.mkdirSync('./public');
+  }
 
   //GET Image Request Handler
   app.get('/images/jpeg/*', (req, res) => {
@@ -48,11 +70,15 @@ exports.start = function(port, isHttps){
       readStream.on('error', function(){
         res.status(404);
         res.type('image/jpeg');
-        res.sendfile('public/sorry.jpg');
+        res.sendFile(path.resolve('public/sorry.jpg'));
       });
 
     }
   })
+
+  // Serve Test Image.
+  app.use('/bk_1.jpg', express.static(__dirname + '/public'));
+
 
   //GET Request Handler
   app.get('/cc*', async function(req, res){
@@ -106,7 +132,7 @@ exports.start = function(port, isHttps){
     res.send(requestDetails+"\n"+JSON.stringify(res.header()._headers, null, 4));
   })
 
-  app.use(express.static(__dirname + '/public'));
+
   app.use(bodyParser.json()); // for parsing application/json
   app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
@@ -123,7 +149,6 @@ exports.start = function(port, isHttps){
   if(isHttps){
     //Https support
     //read keys from filesystem for https
-    var fs = require('fs');
     var privateKey  = fs.readFileSync(__dirname + '/key.pem', 'utf8');
     var certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
     var credentials = {key: privateKey, cert: certificate};
